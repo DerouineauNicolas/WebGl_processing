@@ -76,6 +76,7 @@ uniform float radius;\n\
 uniform vec2 dir;\n\
 varying vec4 vColor;\n\
 varying vec2 vTexCoord;\n\
+uniform int apply_filter;\n\
 \n\
 \n\
 float normpdf(in float x, in float sigma)\n\
@@ -89,17 +90,22 @@ void main() {\n\
     float blur = radius/512.0;; \n\
     float hstep = 1.0; \n\
     float vstep = 1.0; \n\
-    sum += texture2D(u_texture, vec2(tc.x - 4.0*blur*hstep, tc.y - 4.0*blur*vstep)) * 0.0162162162;\n\
-    sum += texture2D(u_texture, vec2(tc.x - 3.0*blur*hstep, tc.y - 3.0*blur*vstep)) * 0.0540540541;\n\
-    sum += texture2D(u_texture, vec2(tc.x - 2.0*blur*hstep, tc.y - 2.0*blur*vstep)) * 0.1216216216;\n\
-    sum += texture2D(u_texture, vec2(tc.x - 1.0*blur*hstep, tc.y - 1.0*blur*vstep)) * 0.1945945946;\n\
-\n\
-    sum += texture2D(u_texture, vec2(tc.x, tc.y)) * 0.2270270270;\n\
-\n\
-    sum += texture2D(u_texture, vec2(tc.x + 1.0*blur*hstep, tc.y + 1.0*blur*vstep)) * 0.1945945946;\n\
-    sum += texture2D(u_texture, vec2(tc.x + 2.0*blur*hstep, tc.y + 2.0*blur*vstep)) * 0.1216216216;\n\
-    sum += texture2D(u_texture, vec2(tc.x + 3.0*blur*hstep, tc.y + 3.0*blur*vstep)) * 0.0540540541;\n\
-    sum += texture2D(u_texture, vec2(tc.x + 4.0*blur*hstep, tc.y + 4.0*blur*vstep)) * 0.0162162162;\n\
+    if(apply_filter==0){\n\
+        sum = texture2D(u_texture, vec2(tc.x, tc.y));\n\
+    }\n\
+    else {\n\
+        sum += texture2D(u_texture, vec2(tc.x - 4.0*blur*hstep, tc.y - 4.0*blur*vstep)) * 0.0162162162;\n\
+        sum += texture2D(u_texture, vec2(tc.x - 3.0*blur*hstep, tc.y - 3.0*blur*vstep)) * 0.0540540541;\n\
+        sum += texture2D(u_texture, vec2(tc.x - 2.0*blur*hstep, tc.y - 2.0*blur*vstep)) * 0.1216216216;\n\
+        sum += texture2D(u_texture, vec2(tc.x - 1.0*blur*hstep, tc.y - 1.0*blur*vstep)) * 0.1945945946;\n\
+        \n\
+        sum += texture2D(u_texture, vec2(tc.x, tc.y)) * 0.2270270270;\n\
+        \n\
+        sum += texture2D(u_texture, vec2(tc.x + 1.0*blur*hstep, tc.y + 1.0*blur*vstep)) * 0.1945945946;\n\
+        sum += texture2D(u_texture, vec2(tc.x + 2.0*blur*hstep, tc.y + 2.0*blur*vstep)) * 0.1216216216;\n\
+        sum += texture2D(u_texture, vec2(tc.x + 3.0*blur*hstep, tc.y + 3.0*blur*vstep)) * 0.0540540541;\n\
+        sum += texture2D(u_texture, vec2(tc.x + 4.0*blur*hstep, tc.y + 4.0*blur*vstep)) * 0.0162162162;\n\
+    }\n\
 \n\
     //discard alpha for our simple demo, multiply by vertex color and return\n\
     gl_FragColor = vec4(sum.rgb, 1.0);\n\
@@ -128,6 +134,7 @@ void main() {\n\
   var _Pmatrix = GL.getUniformLocation(SHADER_PROGRAM, "Pmatrix");
   var _Vmatrix = GL.getUniformLocation(SHADER_PROGRAM, "Vmatrix");
   var _Mmatrix = GL.getUniformLocation(SHADER_PROGRAM, "Mmatrix");
+  var _dofiltering = GL.getUniformLocation(SHADER_PROGRAM, "apply_filter");
   var _greyscality=GL.getUniformLocation(SHADER_PROGRAM, "greyscality");
   var _sampler = GL.getUniformLocation(SHADER_PROGRAM, "sampler");
   var _uv = GL.getAttribLocation(SHADER_PROGRAM, "uv");
@@ -292,10 +299,12 @@ void main() {\n\
     GL.uniformMatrix4fv(_Pmatrix, false, PROJMATRIX);
     GL.uniformMatrix4fv(_Vmatrix, false, VIEWMATRIX);
     GL.uniformMatrix4fv(_Mmatrix, false, MOVEMATRIX);
-    if(pos_z>0)
-       GL.uniform1f(_radius, (pos_z*10.0));
+    if(pos_z>0){
+        GL.uniform1i(_dofiltering, 1);
+        GL.uniform1f(_radius, (pos_z*10.0));
+    }
     else
-       GL.uniform1f(_radius, (pos_z*0.02));
+       GL.uniform1i(_dofiltering, 0);
     if (cube_texture.webglTexture) {
 
       GL.activeTexture(GL.TEXTURE0);
@@ -307,10 +316,14 @@ void main() {\n\
     GL.vertexAttribPointer(_uv, 2, GL.FLOAT, false,4*(3+2),3*4);
     GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, CUBE_FACES);
     GL.drawElements(GL.TRIANGLES, 6*2*3, GL.UNSIGNED_SHORT, 0);
-    if(pos_z<0)
+    _dofiltering
+    if(pos_z<0){
+       GL.uniform1i(_dofiltering, 1);
        GL.uniform1f(_radius, (pos_z*10.0));
+    }
     else
-       GL.uniform1f(_radius, (pos_z*0.02));
+       GL.uniform1i(_dofiltering, 0);
+
     if (cube_texture.webglTexture) {
 
       GL.activeTexture(GL.TEXTURE0);
