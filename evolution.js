@@ -5,9 +5,7 @@ var renderer, scene, camera;
 function init(){
     scene = new THREE.Scene();
 
-    //camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
-    camera = new THREE.OrthographicCamera( 0, window.innerWidth , 0, window.innerHeight , 1, 1000 );
-    //camera.position.z = 0;
+    camera = new THREE.OrthographicCamera( 0, window.innerWidth , 0, window.innerHeight , 0.1, 1000 );
     camera.position.x = 0;
     camera.position.y = -1000;
     camera.position.z = 0;
@@ -23,7 +21,7 @@ function init(){
 var main=function() {
 
   var arr = [];
-  function funcInJsFile(index_arg,pos_x, pos_y, radius_init, x_inc_arg, y_inc_arg) {
+  function Add_new_being(index_arg,pos_x, pos_y, radius_init, x_inc_arg, y_inc_arg) {
     // Do Stuff
     var geometry = new THREE.BoxGeometry( radius_init, radius_init, radius_init );
     var material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
@@ -46,15 +44,15 @@ var main=function() {
 
   function Evoluate(Points, step_size){
           
-          if(Points.m_x<CANVAS.width-step_size && Points.m_x_inc==1){          
+          if(Points.m_x<CANVAS.width-(Points.m_radius/2) && Points.m_x_inc==1){          
              Points.m_x=Points.m_x+step_size;
              //console.log("1");
           }
-          else if(Points.m_x>step_size && Points.m_x_inc==0){
+          else if(Points.m_x>(Points.m_radius/2) && Points.m_x_inc==0){
              //console.log("2");
              Points.m_x=Points.m_x-step_size;
           }
-          else if(Points.m_x>(CANVAS.width-step_size)&& Points.m_x_inc==1){
+          else if(Points.m_x>(CANVAS.width-(Points.m_radius/2))&& Points.m_x_inc==1){
              //console.log("3");             
              Points.m_x_inc=0;
              Points.m_x=Points.m_x-step_size;
@@ -65,15 +63,15 @@ var main=function() {
              Points.m_x=Points.m_x+step_size;
           }
 
-          if(Points.m_y<CANVAS.height-step_size && Points.m_y_inc==1){          
+          if(Points.m_y<CANVAS.height-(Points.m_radius/2) && Points.m_y_inc==1){          
              Points.m_y=Points.m_y+step_size;
              //console.log("1");
           }
-          else if(Points.m_y>step_size && Points.m_y_inc==0){
+          else if(Points.m_y>(Points.m_radius/2) && Points.m_y_inc==0){
              //console.log("2");
-             Points.m_y=Points.m_y-step_size;
+             Points.m_y=Points.m_y-(Points.m_radius/2);
           }
-          else if(Points.m_y>(CANVAS.width-step_size)&& Points.m_y_inc==1){
+          else if(Points.m_y>(CANVAS.height-(Points.m_radius/2))&& Points.m_y_inc==1){
              //console.log("3");             
              Points.m_y_inc=0;
              Points.m_y=Points.m_y-step_size;
@@ -92,13 +90,15 @@ var main=function() {
 
   step_size=3;
 
-  console.log(CANVAS.width);
-  console.log(CANVAS.height);
+  //console.log(CANVAS.width);
+  //console.log(CANVAS.height);
 
   init();
 
-  funcInJsFile(0, 0, 0,50,1,1);
-  funcInJsFile(1, CANVAS.width,CANVAS.height,50,0,0);
+  Add_new_being(0, 0, 0, 50,1,1);
+  Add_new_being(1, CANVAS.width,CANVAS.height,50,0,0);
+  //Add_new_being(0, CANVAS.width, 0, 50,1,1);
+  //Add_new_being(1, 0,CANVAS.height,50,0,0);
 
 
   var animate=function() {
@@ -110,7 +110,7 @@ var main=function() {
           }
           element.m_mesh.position.set(element.m_x, 0, element.m_y)              
               
-          console.log(element);
+          //console.log(element);
           
           Evoluate(element,step_size);                  
       });
