@@ -1,5 +1,6 @@
 var renderer, scene, camera;
 //var geometry, material, mesh, ctx;
+var num_beings=0;
 
 
 function init(){
@@ -34,12 +35,60 @@ var main=function() {
                m_radius: radius_init,
                m_x_inc: x_inc_arg, 
                m_y_inc: y_inc_arg,
-               m_geometry: geometry,
-               m_material: material,
+               //m_geometry: geometry,
+               //m_material: material,
                m_mesh: mesh,
                m_isinscene: 0,
                };
     arr.push(obj);
+    num_beings++;
+  }
+
+  function GetID(array,index_to_find) {      
+      return array.index = index_to_find;
+  }
+
+  function Divide() {
+    // Do Stuff
+      var index_intersection=[];
+      arr.forEach(function(element_on_scope) {          
+          arr.forEach(function(element_to_check) {          
+               if(element_on_scope.m_index==element_to_check.m_index){
+                   //console.log("same");
+               }
+               else{
+                   //console.log("not  same");
+                   if((Math.abs(element_on_scope.m_x - element_to_check.m_x) * 2 < (element_on_scope.m_radius + element_to_check.m_radius)) &&
+                      (Math.abs(element_on_scope.m_y - element_to_check.m_y) * 2 < (element_on_scope.m_radius + element_to_check.m_radius))){
+                       
+                       console.log("Intersection");
+                       index_intersection.push(element_on_scope.m_index);
+                       index_intersection.push(element_to_check.m_index);
+                       element_on_scope.m_mesh.material.dispose();
+                       element_on_scope.m_mesh.geometry.dispose();
+                       element_to_check.m_mesh.material.dispose();
+                       element_to_check.m_mesh.geometry.dispose();
+                       /*if(num_beings<5)
+                       
+                           Add_new_being(num_beings, 
+                                         element_to_check.m_y+element_to_check.m_radius,
+                                         element_to_check.m_x+element_to_check.m_radius,
+                                         element_to_check.m_radius/2,0,0);*/
+                   }
+               }
+          });                  
+      });
+
+      //console.log(index_intersection);
+
+      index_intersection.forEach(function(intersecting_box) {
+          var result=arr.findIndex(GetID,intersecting_box);
+          if(result>-1)
+              arr.splice(intersecting_box,1);
+
+      }); 
+
+      
   }
 
   function Evoluate(Points, step_size){
@@ -90,15 +139,11 @@ var main=function() {
 
   step_size=3;
 
-  //console.log(CANVAS.width);
-  //console.log(CANVAS.height);
-
   init();
 
   Add_new_being(0, 0, 0, 50,1,1);
   Add_new_being(1, CANVAS.width,CANVAS.height,50,0,0);
-  //Add_new_being(0, CANVAS.width, 0, 50,1,1);
-  //Add_new_being(1, 0,CANVAS.height,50,0,0);
+  Add_new_being(2, CANVAS.width, 0, 50,1,1);
 
 
   var animate=function() {
@@ -109,11 +154,11 @@ var main=function() {
               element.m_isinscene=1;
           }
           element.m_mesh.position.set(element.m_x, 0, element.m_y)              
-              
-          //console.log(element);
           
           Evoluate(element,step_size);                  
       });
+
+      Divide(arr);
 
       window.requestAnimationFrame(animate);
       renderer.render(scene, camera);      
