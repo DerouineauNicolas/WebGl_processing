@@ -62,18 +62,11 @@ var main=function() {
                       (Math.abs(element_on_scope.m_y - element_to_check.m_y) * 2 < (element_on_scope.m_radius + element_to_check.m_radius))){
                        
                        console.log("Intersection");
-                       index_intersection.push(element_on_scope.m_index);
-                       index_intersection.push(element_to_check.m_index);
-                       element_on_scope.m_mesh.material.dispose();
-                       element_on_scope.m_mesh.geometry.dispose();
-                       element_to_check.m_mesh.material.dispose();
-                       element_to_check.m_mesh.geometry.dispose();
-                       /*if(num_beings<5)
-                       
-                           Add_new_being(num_beings, 
-                                         element_to_check.m_y+element_to_check.m_radius,
-                                         element_to_check.m_x+element_to_check.m_radius,
-                                         element_to_check.m_radius/2,0,0);*/
+                       element_on_scope.m_x_inc= (element_on_scope.m_x_inc==1)?0:1;
+                       element_on_scope.m_y_inc= (element_on_scope.m_y_inc==1)?0:1;
+                       //element_to_check.m_x_inc= (element_to_check.m_x_inc==1)?0:1;
+                       //element_to_check.m_y_inc= (element_to_check.m_y_inc==1)?0:1;
+
                    }
                }
           });                  
@@ -81,12 +74,12 @@ var main=function() {
 
       //console.log(index_intersection);
 
-      index_intersection.forEach(function(intersecting_box) {
+      /*index_intersection.forEach(function(intersecting_box) {
           var result=arr.findIndex(GetID,intersecting_box);
           if(result>-1)
               arr.splice(intersecting_box,1);
 
-      }); 
+      }); */
 
       
   }
@@ -118,7 +111,7 @@ var main=function() {
           }
           else if(Points.m_y>(Points.m_radius/2) && Points.m_y_inc==0){
              //console.log("2");
-             Points.m_y=Points.m_y-(Points.m_radius/2);
+             Points.m_y=Points.m_y-step_size;
           }
           else if(Points.m_y>(CANVAS.height-(Points.m_radius/2))&& Points.m_y_inc==1){
              //console.log("3");             
@@ -143,7 +136,7 @@ var main=function() {
 
   Add_new_being(0, 0, 0, 50,1,1);
   Add_new_being(1, CANVAS.width,CANVAS.height,50,0,0);
-  Add_new_being(2, CANVAS.width, 0, 50,1,1);
+  Add_new_being(2, CANVAS.width, 0, 200,1,1);
 
 
   var animate=function() {
