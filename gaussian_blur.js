@@ -256,7 +256,7 @@ void main() {\n\
     return image;
   };
 
-  var cube_texture=get_texture("lena.png");
+  var cube_texture=get_texture("Lenna_p2.jpg");
   
   var refresh_texture=function() {
     GL.bindTexture(GL.TEXTURE_2D, videoTexture);
